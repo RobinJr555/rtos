@@ -1,0 +1,12 @@
+obj-y += rt_Event.o
+obj-y += rt_List.o
+obj-y += rt_Mailbox.o
+obj-y += rt_MemBox.o
+obj-y += rt_Memory.o
+obj-y += rt_Mutex.o
+obj-y += rt_Robin.o
+obj-y += rt_Semaphore.o
+obj-y += rt_System.o
+obj-y += rt_Task.o
+obj-y += rt_Time.o
+obj-y += rt_Timer.o
