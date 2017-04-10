@@ -1,0 +1,24 @@
+if TARGET_ARMFLY_STM32F407IG
+
+config SYS_DEFCONFIG
+	bool
+	default y
+	select CPU_V7M
+
+config CPU_V7M_CM4
+	bool
+	default y
+
+config SYS_BOARD
+	string
+	default "armfly_stm32f407ig"
+
+config SYS_VENDOR
+	string
+	default "st"
+
+config SYS_SOC
+	string
+	default "stm32f4"
+
+endif

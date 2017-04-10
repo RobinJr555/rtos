@@ -1,0 +1,20 @@
+if TARGET_NUCLEO_STM32F401RE
+
+config SYS_DEFCONFIG
+	bool
+	default y
+	select CPU_V7M
+
+config SYS_BOARD
+	string
+	default "nucleo_stm32f401re"
+
+config SYS_VENDOR
+	string
+	default "st"
+
+config SYS_SOC
+	string
+	default "stm32f4"
+
+endif
