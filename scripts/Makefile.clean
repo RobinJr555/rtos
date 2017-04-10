@@ -1,0 +1,88 @@
+
+src := $(obj)
+
+PHONY := __clean
+__clean:
+
+include .config
+include scripts/Kbuild.include
+
+# The filename Kbuild has precedence over Makefile
+kbuild-dir := $(src)
+kbuild-file := $(kbuild-dir)/Makefile
+include $(kbuild-file)
+
+# Figure out what we need to build from the various variables
+# ==========================================================================
+
+__subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+subdir-y	+= $(__subdir-y)
+
+# Subdirectories we need to descend into
+
+subdir-ym	:= $(sort $(subdir-y))
+subdir-ymn	:= $(sort $(subdir-ym))
+
+# Add subdir path
+
+subdir-ymn	:= $(addprefix $(obj)/,$(subdir-ymn))
+
+# Temporal work-around
+
+subdir-ymn	:= $(foreach f, $(subdir-ymn), \
+				$(if $(wildcard $(srctree)/$f/Makefile),$f))
+
+# build a list of files to remove, usually relative to the current
+# directory
+temp_o_file := $(filter %.o, $(obj-y) $(extra-y))
+temp_d_file := $(patsubst %o,%d,$(temp_o_file))
+temp_built-in_file := built-in.o
+targets += $(temp_o_file) $(temp_d_file) $(temp_built-in_file)
+
+__clean-files := $(always) $(targets) $(clean-files)
+
+__clean-files := $(filter-out $(no-clean-files), $(__clean-files))
+
+__clean-files := $(wildcard                                               \
+                 $(addprefix $(obj)/, $(filter-out /%, $(__clean-files))) \
+                 $(filter /%, $(__clean-files)))
+
+__clean-dirs  := $(wildcard                                            \
+                 $(addprefix $(obj)/, $(filter-out /%, $(clean-dirs))) \
+                 $(filter /%, $(clean-dirs)))
+
+# ===================================================================
+
+quiet_cmd_clean    = CLEAN   $(obj)
+      cmd_clean    = rm -f $(__clean-files)
+quiet_cmd_cleandir = CLEAN   $(__clean-dirs)
+      cmd_cleandir = rm -rf $(__clean-dirs)
+
+__clean: $(subdir-ymn)
+ifneq ($(strip $(__clean-files)),)
+	+$(call cmd,clean)
+endif
+ifneq ($(strip $(__clean-dirs)),)
+	+$(call cmd,cleandir)
+endif
+	@:
+
+# ===================================================================
+# Generic stuff
+# ===================================================================
+
+# Descending
+# -------------------------------------------------------------------
+
+PHONY += $(subdir-ymn)
+$(subdir-ymn):
+	$(Q)$(MAKE) $(clean)=$@
+
+# If quiet is set, only print short version of command
+cmd = @$(if $($(quiet)cmd_$(1)),echo '  $($(quiet)cmd_$(1))' &&) $(cmd_$(1))
+
+# Declare the contents of the .PHONY variable as phony.  We keep that
+# information in a variable se we can use it in if_changed and friends.
+
+.PHONY: $(PHONY)
+

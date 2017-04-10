@@ -1,0 +1,31 @@
+####################################################################
+#
+# config.rtos
+#   -- Top level configuration file
+#
+# Feb 24, 2017. Zhu Mingjun(zhumj1991@163.com)
+#
+####################################################################
+
+#
+# Optimization and debugging
+#
+
+menu "General setup"
+
+config CROSS_COMPILE
+	string "Cross compiler prefix"
+
+config CC_OPTIMIZE_FOR_SIZE
+	bool "Optimisize size"
+	default n
+
+config CC_DEBUG
+	bool "Generate debug information"
+	default n
+
+config CODE_DEBUG
+	bool "Debug code in ram"
+	default n
+endmenu		# Genetal setup
+
