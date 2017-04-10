@@ -27,7 +27,7 @@ objtree := $(DIR_ROOT)
 export srctree objtree
 
 ifneq (.config,$(wildcard .config))
-$(error ".config does not exists, run 'make menuconfig' first.")
+$(warning ".config does not exists, run 'make menuconfig' first.")
 else
 include $(srctree)/.config
 endif
