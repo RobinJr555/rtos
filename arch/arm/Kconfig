@@ -1,0 +1,118 @@
+menu "ARM architecture"
+	depends on ARM
+
+#
+# cpu arch
+#
+config SYS_ARCH
+	string
+	default "arm"
+
+config ARM64
+	bool
+	select PHYS_64BIT
+	select SYS_CACHE_SHIFT_6
+
+config HAS_VBAR
+	bool
+
+config HAS_THUMB2
+	bool
+
+config CPU_ARM720T
+	bool
+	select SYS_CACHE_SHIFT_5
+
+config CPU_ARM920T
+	bool
+	select SYS_CACHE_SHIFT_5
+
+config CPU_ARM926EJS
+	bool
+	select SYS_CACHE_SHIFT_5
+
+config CPU_ARM946ES
+	bool
+	select SYS_CACHE_SHIFT_5
+
+config CPU_ARM1136
+	bool
+	select SYS_CACHE_SHIFT_5
+
+config CPU_ARM1176
+	bool
+	select HAS_VBAR
+	select SYS_CACHE_SHIFT_5
+
+config CPU_V7
+	bool
+	select HAS_VBAR
+	select HAS_THUMB2
+	select SYS_CACHE_SHIFT_6
+
+config CPU_V7M
+	bool
+	select HAS_THUMB2
+	select SYS_CACHE_SHIFT_5
+
+config CPU_PXA
+	bool
+	select SYS_CACHE_SHIFT_5
+
+config CPU_SA1100
+	bool
+	select SYS_CACHE_SHIFT_5
+
+config SYS_CPU
+	string
+	default "arm720t" if CPU_ARM720T
+	default "arm920t" if CPU_ARM920T
+	default "arm926ejs" if CPU_ARM926EJS
+	default "arm946es" if CPU_ARM946ES
+	default "arm1136" if CPU_ARM1136
+	default "arm1176" if CPU_ARM1176
+	default "armv7" if CPU_V7
+	default "armv7m" if CPU_V7M
+	default "pxa" if CPU_PXA
+	default "sa1100" if CPU_SA1100
+	default "armv8" if ARM64
+
+config SYS_CACHE_SHIFT_5
+	bool
+
+config SYS_CACHE_SHIFT_6
+	bool
+
+config SYS_CACHE_SHIFT_7
+	bool
+
+config SYS_CACHELINE_SIZE
+	int
+	default 128 if SYS_CACHE_SHIFT_7
+	default 64 if SYS_CACHE_SHIFT_6
+	default 32 if SYS_CACHE_SHIFT_5
+
+
+#
+# select target board
+#
+choice
+	prompt "Select target"
+	default STM32
+
+config BOARD_ST
+	bool "ST boards"
+
+endchoice
+
+source "board/st/Kconfig"
+
+#
+# select cpu endian
+#
+config CPU_LITTLE_ENDIAN
+	bool "Little Endian"
+	default y
+
+
+endmenu
