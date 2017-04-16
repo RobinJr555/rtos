@@ -75,12 +75,12 @@ echo
 
 echo "choice"
 echo "	prompt \"RTOS kernel\""
-echo "	default RTOS_RTX"
+echo "	default KERNEL_RTX"
 echo
 
 for ((i = 0; i < ${#KERNEL[*]}; i++))
 do
-	CFG="RTOS_"$(echo ${KERNEL[$i]} | tr '[:lower:]' '[:upper:]')
+	CFG="KERNEL_"$(echo ${KERNEL[$i]} | tr '[:lower:]' '[:upper:]')
 	echo "config ${CFG}"
 	echo "	bool \"${KERNEL[$i]}\""
 	echo
@@ -95,7 +95,7 @@ echo "	string"
 
 for ((i = 0; i < ${#KERNEL[*]}; i++))
 do
-	CFG="RTOS_"$(echo ${KERNEL[$i]} | tr '[:lower:]' '[:upper:]')
+	CFG="KERNEL_"$(echo ${KERNEL[$i]} | tr '[:lower:]' '[:upper:]')
 	echo "	default \"${KERNEL[i]}\" if ${CFG}"
 done
 echo
