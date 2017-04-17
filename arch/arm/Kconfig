@@ -114,5 +114,11 @@ config CPU_LITTLE_ENDIAN
 	bool "Little Endian"
 	default y
 
+#
+# select vfp support
+#
+config CPU_HAS_FPU
+	bool "Support FPU"
+	default n
 
 endmenu

@@ -41,6 +41,7 @@ PLATFORM_CPPFLAGS += -fmessage-length=0 -fno-exceptions \
 CC_SYMBOLS += -D__ARM__
 ifeq (CONFIG_CPU_HAS_FPU,y)
 CC_SYMBOLS += -D__FPU_PRESENT
+PLATFORM_CPPFLAGS += -mfloat-abi=hard
 endif
 
 INCLUDE_PATHS += -I$(srctree)/arch/$(ARCH)/include
