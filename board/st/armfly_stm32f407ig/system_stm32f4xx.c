@@ -1,4 +1,4 @@
-#include "stm32f4xx.h"
+#include <asm/arch/stm32f4xx.h>
 
 /*----------------------------------------------------------
  * Define clocks
