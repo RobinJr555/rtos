@@ -45,4 +45,3 @@ PLATFORM_CPPFLAGS += -mfloat-abi=hard
 endif
 
 INCLUDE_PATHS += -I$(srctree)/arch/$(ARCH)/include
-INCLUDE_PATHS += -I$(srctree)/arch/$(ARCH)/include
