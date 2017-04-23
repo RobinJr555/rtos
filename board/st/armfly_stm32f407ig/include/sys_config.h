@@ -1,0 +1,7 @@
+#ifndef __SYS_CONFIG_H
+#define __SYS_CONFIG_H
+
+#define CONFIG_STM32_HSE_HZ 8000000UL
+#define CONFIG_SYS_CLK_FREQ 168000000UL
+
+#endif /* SYS_CONFIG_H */

@@ -1,6 +1,8 @@
 #ifndef CMSIS_RTX_H
 #define CMSIS_RTX_H
 
+#include <sys_config.h>
+
 //
 // <h>Thread Configuration
 // =======================
@@ -33,7 +35,7 @@ extern unsigned char        __StackTop[];
 //   <i> Defines the timer clock value.
 //   <i> Default: 6000000  (6MHz)
 
-#define OS_CLOCK            168000000
+#define OS_CLOCK            CONFIG_SYS_CLK_FREQ
 
 
 #endif

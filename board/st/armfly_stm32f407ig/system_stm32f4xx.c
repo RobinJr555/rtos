@@ -1,9 +1,11 @@
+#include <sys_config.h>
 #include <asm/arch/stm32f4xx.h>
+
 
 /*----------------------------------------------------------
  * Define clocks
  *--------------------------------------------------------*/
-#define  SYSTEM_CLOCK    ( 168000000UL )
+#define  SYSTEM_CLOCK    ( CONFIG_SYS_CLK_FREQ )
 
 /*----------------------------------------------------------
  * Externals
