@@ -120,6 +120,7 @@ include scripts/Kbuild.include
 
 libs-y += arch/$(ARCH)/
 libs-y += $(BOARDDIR)/
+libs-y += driver/
 libs-y += library/
 libs-y += $(KERNELDIR)/
 libs-y += $(APPDIR)/
