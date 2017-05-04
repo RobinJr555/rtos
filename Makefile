@@ -112,6 +112,7 @@ LDFLAGS_rtos += $(LDFLAGS_FINAL)
 
 ######################################################################
 
+INCLUDE_PATHS += -include $(srctree)/include/generated/autoconf.h
 INCLUDE_PATHS += -I$(srctree)/include
 
 export INCLUDE_PATHS
@@ -132,7 +133,7 @@ libs-y := $(patsubst %/, %/built-in.o, $(libs-y))
 rtos-init := $(head-y)
 rtos-main := $(libs-y)
 
-
+ALL-y += silentconfig create_symlink
 ALL-y += rtos.elf rtos.bin rtos.text
 
 ######################################################################
@@ -149,13 +150,33 @@ OPT_menuconfig :=
 OPT_silentconfig := --silentoldconfig
 
 .PHONY += config menuconfig silentconfig
-config menuconfig silentconfig:
+config menuconfig:
 	$(Q)if [ ! -e scripts/$(VAR_HOST)/$(BIN_$@) ]; then   \
 		echo;                                             \
 		echo "ERROR: host $(VAR_HOST) not supported yet"; \
 		exit 1;                                           \
 	fi
 	$(Q)scripts/$(VAR_HOST)/$(BIN_$@) $(OPT_$@) Kconfig
+
+silentconfig:
+	$(Q)mkdir -p include/config include/generated
+	$(Q)test -e include/generated/autoksyms.h || \
+		touch   include/generated/autoksyms.h
+	$(Q)scripts/$(VAR_HOST)/$(BIN_$@) $(OPT_$@) Kconfig
+
+# symbolic links
+# If arch/$(ARCH)/mach-$(SOC)/include/mach exists,
+# make a symbolic link to that directory.
+# Otherwise, create a symbolic link to arch/$(ARCH)/include/asm/arch-$(SOC).
+PHONY += create_symlink
+create_symlink:
+	$(Q)mkdir -p arch/$(ARCH)/include/asm
+	$(Q)if [ -d $(srctree)/arch/$(ARCH)/mach-$(SOC)/include/mach ]; then		\
+		dest=arch/$(ARCH)/mach-$(SOC)/include/mach;		\
+	else	\
+		dest=arch/$(ARCH)/include/asm/arch-$(if $(SOC),$(SOC),$(CPU));	\
+	fi;		\
+	ln -fsn $(srctree)/$$dest arch/$(ARCH)/include/asm/arch
 
 .PHONY += prepare
 prepare:
