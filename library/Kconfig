@@ -1,0 +1,7 @@
+menu "Select library"
+
+config OF_LIBFDT
+	bool "Enable FDT library"
+	default n
+
+endmenu

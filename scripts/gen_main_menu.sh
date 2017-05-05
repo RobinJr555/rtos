@@ -114,16 +114,16 @@ echo
 
 ######################################################################
 echo_separator "Select driver"
-echo "menu \"Driver\""
-
-echo "endmenu"
+if [ -f "Driver/Kconfig" ]; then
+	echo "source \"driver/Kconfig\""
+fi
 echo
 
 ######################################################################
-echo_separator "Select package"
-echo "menu \"Package\""
-
-echo "endmenu"
+echo_separator "Select library"
+if [ -f "library/Kconfig" ]; then
+	echo "source \"library/Kconfig\""
+fi
 echo
 
 ######################################################################
