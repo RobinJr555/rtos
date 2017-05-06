@@ -149,6 +149,15 @@ OPT_config :=
 OPT_menuconfig :=
 OPT_silentconfig := --silentoldconfig
 
+.PHONY += %_defconfig
+%_defconfig:
+	$(Q)if [ ! -e configs/$@ ]; then                      \
+		echo;                                             \
+		echo "ERROR: configs/$@ does not exit";           \
+		exit 1;                                           \
+	fi
+	$(Q)scripts/$(VAR_HOST)/conf --defconfig=configs/$@ Kconfig
+
 .PHONY += config menuconfig silentconfig
 config menuconfig:
 	$(Q)if [ ! -e scripts/$(VAR_HOST)/$(BIN_$@) ]; then   \
