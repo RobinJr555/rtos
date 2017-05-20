@@ -191,8 +191,8 @@ create_symlink:
 prepare:
 	$(Q)chmod u+x scripts/gen_main_menu.sh
 	$(Q)chmod u+x scripts/gen_sub_menu.py
-	$(Q)scripts/gen_main_menu.sh > Kconfig
-	$(Q)scripts/gen_sub_menu.py >& /dev/nell
+	$(Q)bash scripts/gen_main_menu.sh > Kconfig
+	$(Q)scripts/gen_sub_menu.py > /dev/null 2>&1
 
 ######################################################################
 # Rule to link rtos.elf
