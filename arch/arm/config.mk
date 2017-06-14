@@ -36,7 +36,7 @@ PLATFORM_CPPFLAGS += $(arch-y) $(tune-y)
 LDFLAGS_FINAL += -Wl,--gc-sections
 PLATFORM_CPPFLAGS += -fmessage-length=0 -fno-exceptions \
 		     -ffunction-sections -fdata-sections -fno-common -ffixed-r9 \
-			 -MMD -fno-delete-null-pointer-checks -fomit-frame-pointer
+			 -fno-delete-null-pointer-checks -fomit-frame-pointer
 
 CC_SYMBOLS += -D__ARM__
 ifeq (CONFIG_CPU_HAS_FPU,y)

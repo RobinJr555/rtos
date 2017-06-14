@@ -1,9 +1,19 @@
 #
 # SPDX-License-Identifier:	GPL-2.0
 #
+# Backward compatibility
+asflags-y  += $(EXTRA_AFLAGS)
+ccflags-y  += $(EXTRA_CFLAGS)
+cppflags-y += $(EXTRA_CPPFLAGS)
+ldflags-y  += $(EXTRA_LDFLAGS)
 
 # Figure out what we need to build from the various variables
 # ===========================================================================
+
+# When an object is listed to be built compiled-in and modular,
+# only build the compiled-in version
+
+obj-m := $(filter-out $(obj-y),$(obj-m))
 
 # Libraries are always collected in one lib file.
 # Filter out objects already built-in
@@ -21,6 +31,7 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
 # Determine modorder.
 # Unfortunately, we don't have information about ordering between -y
 # and -m subdirs.  Just put -y's first.
+modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
 
 __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
 subdir-y	+= $(__subdir-y)
@@ -33,9 +44,28 @@ obj-m		:= $(filter-out %/, $(obj-m))
 
 subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
 
+# if $(foo-objs) exists, foo.o is a composite object
+multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+multi-used   := $(multi-used-y) $(multi-used-m)
+single-used-m := $(sort $(filter-out $(multi-used-m),$(obj-m)))
+
+# Build list of the parts of our composite objects, our composite
+# objects depend on those (obviously)
+multi-objs-y := $(foreach m, $(multi-used-y), $($(m:.o=-objs)) $($(m:.o=-y)))
+multi-objs-m := $(foreach m, $(multi-used-m), $($(m:.o=-objs)) $($(m:.o=-y)))
+multi-objs   := $(multi-objs-y) $(multi-objs-m)
+
 # $(subdir-obj-y) is the list of objects in $(obj-y) which uses dir/ to
 # tell kbuild to descend
 subdir-obj-y := $(filter %/built-in.o, $(obj-y))
+
+# $(obj-dirs) is a list of directories that contain object files
+obj-dirs := $(dir $(multi-objs) $(obj-y))
+
+# Replace multi-part objects by their individual parts, look at local dir only
+real-objs-y := $(foreach m, $(filter-out $(subdir-obj-y), $(obj-y)), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m))) $(extra-y)
+real-objs-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
 
 # Add subdir path
 
@@ -57,4 +87,66 @@ multi-objs-m	:= $(addprefix $(obj)/,$(multi-objs-m))
 subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
 obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
 
+c_flags         = -Wp,-MD,$(depfile) -std=gnu99 $(CC_FLAGS) $(PLATFORM_CPPFLAGS)     \
+			$(ccflags-y) $(CC_SYMBOLS) $(INCLUDE_PATHS)
 
+a_flags         = -Wp,-MD,$(depfile) -x assembler-with-cpp $(CC_FLAGS) $(PLATFORM_CPPFLAGS) \
+			$(asflags-y) $(CC_SYMBOLS) $(INCLUDE_PATHS)
+
+cpp_flags       = -Wp,-MD,$(depfile) -std=gnu++98 $(CC_FLAGS) $(PLATFORM_CPPFLAG    S) \
+			$(cppflags-y) $(CC_SYMBOLS) $(INCLUDE_PATHS)
+
+ld_flags        = $(LD_FLAGS) $(ldflags-y)
+
+# Finds the multi-part object the current object will be linked into
+modname-multi = $(sort $(foreach m,$(multi-used),\
+		$(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
+
+# Useful for describing the dependency of composite objects
+# Usage:
+#   $(call multi_depend, multi_used_targets, suffix_to_remove, suffix_to_add)
+define multi_depend
+$(foreach m, $(notdir $1), \
+	$(eval $(obj)/$m: \
+	$(addprefix $(obj)/, $(foreach s, $3, $($(m:%$(strip $2)=%$(s)))))))
+endef
+
+# Shipped files
+# ===========================================================================
+
+quiet_cmd_shipped = SHIPPED $@
+cmd_shipped = cat $< > $@
+
+$(obj)/%: $(src)/%_shipped
+	$(call cmd,shipped)
+
+# Commands useful for building a boot image
+# ===========================================================================
+#
+#	Use as following:
+#
+#	target: source(s) FORCE
+#		$(if_changed,ld/objcopy/gzip)
+#
+#	and add target to extra-y so that we know we have to
+#	read in the saved command line
+
+# Linking
+# ---------------------------------------------------------------------------
+
+quiet_cmd_ld = LD      $@
+cmd_ld = $(LD) $(LDFLAGS) $(ldflags-y) $(LDFLAGS_$(@F)) \
+	       $(filter-out FORCE,$^) -o $@
+
+# Objcopy
+# ---------------------------------------------------------------------------
+
+quiet_cmd_objcopy = OBJCOPY $@
+cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
+
+# Gzip
+# ---------------------------------------------------------------------------
+
+quiet_cmd_gzip = GZIP    $@
+cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
+	(rm -f $@ ; false)

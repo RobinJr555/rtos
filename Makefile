@@ -26,12 +26,66 @@ srctree := $(DIR_ROOT)
 objtree := $(DIR_ROOT)
 export srctree objtree
 
-ifneq (.config,$(wildcard .config))
-$(warning ".config does not exists, run 'make menuconfig' first.")
-else
-include $(srctree)/.config
+######################################################################
+HOSTARCH := $(shell uname -m | \
+	sed -e s/i.86/x86/ \
+	    -e s/sun4u/sparc64/ \
+	    -e s/arm.*/arm/ \
+	    -e s/sa110/arm/ \
+	    -e s/ppc64/powerpc/ \
+	    -e s/ppc/powerpc/ \
+	    -e s/macppc/powerpc/\
+	    -e s/sh.*/sh/)
+
+HOSTOS := $(shell uname -s | tr '[:upper:]' '[:lower:]' | \
+	   sed -e 's/\(cygwin\).*/cygwin/')
+
+export	HOSTARCH HOSTOS
+
+######################################################################
+# SHELL used by kbuild
+CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+	  else if [ -x /bin/bash ]; then echo /bin/bash; \
+	  else echo sh; fi ; fi)
+
+HOSTCC       = cc
+HOSTCXX      = c++
+HOSTCFLAGS   = -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer \
+		$(if $(CONFIG_TOOLS_DEBUG),-g)
+HOSTCXXFLAGS = -O2
+
+ifeq ($(HOSTOS),darwin)
+# get major and minor product version (e.g. '10' and '6' for Snow Leopard)
+DARWIN_MAJOR_VERSION	= $(shell sw_vers -productVersion | cut -f 1 -d '.')
+DARWIN_MINOR_VERSION	= $(shell sw_vers -productVersion | cut -f 2 -d '.')
+
+os_x_before	= $(shell if [ $(DARWIN_MAJOR_VERSION) -le $(1) -a \
+	$(DARWIN_MINOR_VERSION) -le $(2) ] ; then echo "$(3)"; else echo "$(4)"; fi ;)
+
+# Snow Leopards build environment has no longer restrictions as described above
+HOSTCC       = $(call os_x_before, 10, 5, "cc", "gcc")
+HOSTCFLAGS  += $(call os_x_before, 10, 4, "-traditional-cpp")
+HOSTLDFLAGS += $(call os_x_before, 10, 5, "-multiply_defined suppress")
+
+# since Lion (10.7) ASLR is on by default, but we use linker generated lists
+# in some host tools which is a problem then ... so disable ASLR for these
+# tools
+HOSTLDFLAGS += $(call os_x_before, 10, 7, "", "-Xlinker -no_pie")
 endif
 
+export CONFIG_SHELL HOSTCC HOSTCFLAGS HOSTLDFLAGS
+
+######################################################################
+sinclude include/config/auto.conf
+
+# If .config needs to be updated, it will be done via the dependency
+.config: ;
+
+include/config/%.conf: .config
+	$(Q)$(MAKE) $(build)=scripts/kconfig silentoldconfig
+	$(Q)touch include/config/auto.conf
+
+######################################################################
 ARCH	:= $(CONFIG_SYS_ARCH:"%"=%)
 CPU		:= $(CONFIG_SYS_CPU:"%"=%)
 SOC		:= $(CONFIG_SYS_SOC:"%"=%)
@@ -51,9 +105,7 @@ export ARCH CPU BOARD VENDOR SOC CPUDIR BOARDDIR KERNEL KERNELDIR
 
 ######################################################################
 CROSS_COMPILE := $(CONFIG_CROSS_COMPILE:"%"=%)
-ifeq ($(CROSS_COMPILE),)
-$(warning "Please set cross compiler[General setup -> Cross compiler prefix]")
-endif
+
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
 CC		= $(CROSS_COMPILE)gcc
@@ -133,7 +185,7 @@ libs-y := $(patsubst %/, %/built-in.o, $(libs-y))
 rtos-init := $(head-y)
 rtos-main := $(libs-y)
 
-ALL-y += silentconfig create_symlink
+ALL-y += prepare create_symlink
 ALL-y += rtos.elf rtos.bin rtos.text
 
 ######################################################################
@@ -142,42 +194,32 @@ ALL-y += rtos.elf rtos.bin rtos.text
 all: $(ALL-y)
 
 ######################################################################
-BIN_config := mconf
-BIN_menuconfig := mconf
-BIN_silentconfig := conf
-OPT_config :=
-OPT_menuconfig :=
-OPT_silentconfig := --silentoldconfig
+PHONY += kconfig_prepare scripts_basic config %config
+kconfig_prepare:
+	$(Q)chmod u+x scripts/gen_main_menu.sh
+	$(Q)chmod u+x scripts/gen_sub_menu.py
+	$(Q)bash scripts/gen_main_menu.sh > Kconfig
+	$(Q)scripts/gen_sub_menu.py > /dev/null 2>&1
 
-.PHONY += %_defconfig
-%_defconfig:
-	$(Q)if [ ! -e configs/$@ ]; then                      \
-		echo;                                             \
-		echo "ERROR: configs/$@ does not exit";           \
-		exit 1;                                           \
-	fi
-	$(Q)scripts/$(VAR_HOST)/conf --defconfig=configs/$@ Kconfig
+# Basic helpers built in scripts/
+scripts_basic:
+	$(Q)$(MAKE) $(build)=scripts/basic
+	$(Q)rm -f .tmp_quiet_recordmcount
 
-.PHONY += config menuconfig silentconfig
-config menuconfig:
-	$(Q)if [ ! -e scripts/$(VAR_HOST)/$(BIN_$@) ]; then   \
-		echo;                                             \
-		echo "ERROR: host $(VAR_HOST) not supported yet"; \
-		exit 1;                                           \
-	fi
-	$(Q)scripts/$(VAR_HOST)/$(BIN_$@) $(OPT_$@) Kconfig
+config: kconfig_prepare scripts_basic
+	$(Q)$(MAKE) $(build)=scripts/kconfig $@
 
-silentconfig:
-	$(Q)mkdir -p include/config include/generated
-	$(Q)test -e include/generated/autoksyms.h || \
-		touch   include/generated/autoksyms.h
-	$(Q)scripts/$(VAR_HOST)/$(BIN_$@) $(OPT_$@) Kconfig
+%config: kconfig_prepare scripts_basic
+	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+
+######################################################################
+PHONY += prepare create_symlink
+prepare: include/config/auto.conf
 
 # symbolic links
 # If arch/$(ARCH)/mach-$(SOC)/include/mach exists,
 # make a symbolic link to that directory.
 # Otherwise, create a symbolic link to arch/$(ARCH)/include/asm/arch-$(SOC).
-PHONY += create_symlink
 create_symlink:
 	$(Q)mkdir -p arch/$(ARCH)/include/asm
 	$(Q)if [ -d $(srctree)/arch/$(ARCH)/mach-$(SOC)/include/mach ]; then		\
@@ -187,12 +229,6 @@ create_symlink:
 	fi;		\
 	ln -fsn $(srctree)/$$dest arch/$(ARCH)/include/asm/arch
 
-.PHONY += prepare
-prepare:
-	$(Q)chmod u+x scripts/gen_main_menu.sh
-	$(Q)chmod u+x scripts/gen_sub_menu.py
-	$(Q)bash scripts/gen_main_menu.sh > Kconfig
-	$(Q)scripts/gen_sub_menu.py > /dev/null 2>&1
 
 ######################################################################
 # Rule to link rtos.elf
@@ -263,6 +299,13 @@ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-fi les)
       cmd_rmfiles = rm -f $(rm-files)
 
 targets := $(wildcard $(sort $(targets)))
+cmd_files := $(wildcard .*.cmd $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
+
+ifneq ($(cmd_files),)
+  $(cmd_files): ;	# Do not try to update included dependency files
+  include $(cmd_files)
+endif
+
 ######################################################################
 PHONY += help
 help:
