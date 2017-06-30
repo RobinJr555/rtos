@@ -76,7 +76,7 @@ endif
 export CONFIG_SHELL HOSTCC HOSTCFLAGS HOSTLDFLAGS
 
 ######################################################################
-sinclude include/config/auto.conf
+sinclude .config
 
 # If .config needs to be updated, it will be done via the dependency
 .config: ;

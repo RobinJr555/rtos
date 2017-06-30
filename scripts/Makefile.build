@@ -32,7 +32,7 @@ subdir-ccflags-y :=
 DEPS :=
 
 include scripts/Kbuild.include
-include .config
+-include .config
 
 
 # The filename Kbuild has precedence over Makefile
