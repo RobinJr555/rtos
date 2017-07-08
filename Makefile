@@ -288,7 +288,7 @@ export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o     
 clean distclean: $(clean-dirs)
 	$(call cmd,rmdirs)
 	$(call cmd,rmfiles)
-	@find $(srctree) $(RCS_FIND_IGNORE) \
+	@find $(rtos-dirs) $(RCS_FIND_IGNORE) \
 		\( -name '.*.d' -o -name '.*.tmp' -o -name '*.tmp_*.o.*' \
 		-o -name '.*.cmd' \) -type f -print | xargs rm -f
 
