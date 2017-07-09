@@ -154,7 +154,7 @@ export PLATFORM_CPPFLAGS PLATFORM_LDFLAGS CC_SYMBOLS
 ifeq ($(CONFIG_USE_PRIVATE_LIBGCC),y)
 PLATFORM_LIBGCC = arch/$(ARCH)/lib/lib.a
 else
-PLATFORM_LIBGCC := -lgcc
+PLATFORM_LIBGCC += -L $(shell dirname `$(CC) $(CFLAGS) -print-libgcc-file-name`) -lgcc
 endif
 PLATFORM_LIBS += $(PLATFORM_LIBGCC)
 PLATFORM_LIBS += -lm -lc -lnosys -lstdc++ -lsupc++
@@ -233,9 +233,9 @@ create_symlink:
 ######################################################################
 # Rule to link rtos.elf
 # FIXME: cann't find _start
-#quiet_cmd_rtos__ = LD      $@
-#      cmd_rtos__ = $(LD) $(LD_FLAGS) $(LDFLAGS_rtos) -o $@  \
-#      -T $(LDSCRIPT) $(rtos-init)            \
+#quiet_cmd_rtos = LD      $@
+#      cmd_rtos = $(LD) $(LD_FLAGS) $(LDFLAGS_rtos) -o $@  \
+#      -T $(LDSCRIPT) $(rtos-init) \
 #      --start-group $(rtos-main) --end-group \
 #      $(PLATFORM_LIBS) -Map $(@:.elf=.map)
 quiet_cmd_rtos = CC      $@
