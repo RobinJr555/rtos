@@ -1,6 +1,5 @@
-#include <driver/driver.h>
-#include <sys_config.h>
-#include <asm/arch/stm32f4xx.h>
+#include "common.h"
+#include "asm/arch/stm32.h"
 
 
 /*----------------------------------------------------------
@@ -43,6 +42,4 @@ void SystemInit (void)
 #endif
 
   SystemCoreClock = SYSTEM_CLOCK;
-
-  board_init_r();
 }
