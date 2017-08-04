@@ -1,7 +1,7 @@
 #ifndef CMSIS_RTX_H
 #define CMSIS_RTX_H
 
-#include <sys_config.h>
+#include "board_config.h"
 
 //
 // <h>Thread Configuration

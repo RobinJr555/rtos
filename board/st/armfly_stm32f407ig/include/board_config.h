@@ -1,0 +1,8 @@
+#ifndef __BOARD_CONFIG_H
+#define __BOARD_CONFIG_H
+
+#define CONFIG_STM32_HSE_HZ	(25000000UL)
+#define CONFIG_SYS_CLK_FREQ	(168000000UL)
+#define CONFIG_GPIO_NUM		(144)
+
+#endif /* SYS_CONFIG_H */
