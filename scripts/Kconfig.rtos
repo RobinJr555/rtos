@@ -20,12 +20,43 @@ config CC_OPTIMIZE_FOR_SIZE
 	bool "Optimisize size"
 	default n
 
+#######################################
+comment "Debug configure"
+
 config CC_DEBUG
 	bool "Generate debug information"
 	default n
+	help
+	  This option will add '-g' to CC_FLAGS.
 
 config CODE_DEBUG
 	bool "Debug code in ram"
 	default n
+	help
+	  This option will link code in ram, not use any rom/flash memories.
+	  User should use 'make clean' after enabling this option.
+
+config ENABLE_DEBUG
+	bool "Enable dbg information"
+	default n
+	help
+	  This option will enable dbg() to output system debug information
+	  through a uart.
+
+config EARLY_PRINTF
+	bool "Enable early printf"
+	default n
+	help
+	  System will initialize a early uart and print some dbg information
+	  before driver system bootup.
+
+config RTOS_PRINTF
+	bool "Enable RTOS printf"
+	default y
+	help
+	  This option will enable rtos_printf(), recommand to use it instead
+	  of newlib printf(). Newlib printf use lots of stack, it's bad for
+	  low memory system.
+
 endmenu		# Genetal setup
 
