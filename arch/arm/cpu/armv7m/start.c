@@ -185,8 +185,9 @@ const pFunc __Vectors[] __attribute__ ((section(".vectors"))) = {
   Reset Handler called on controller reset
  *----------------------------------------------------------------------------*/
 void Reset_Handler(void) {
-  uint32_t *pSrc, *pDest;
   uint32_t *pTable __attribute__((unused));
+#ifndef CONFIG_CODE_DEBUG
+  uint32_t *pSrc, *pDest;
 
 /*  Firstly it copies data from read only memory to RAM. There are two schemes
  *  to copy. One can copy more than one sections. Another can only copy
@@ -231,7 +232,7 @@ void Reset_Handler(void) {
     *pDest++ = *pSrc++;
   }
 #endif /*__STARTUP_COPY_MULTIPLE */
-
+#endif
 /*  This part of work usually is done in C library startup code. Otherwise,
  *  define this macro to enable it in this startup.
  *
