@@ -1,4 +1,34 @@
-__attribute((weak)) void _exit(int return_code) 
+#include <stddef.h>
+#include <sys/stat.h>
+#include "common.h"
+#include "driver.h"
+
+extern __driver_init __driver_start;
+extern __driver_init __driver_end;
+
+static void driver_init(void)
+{
+	__driver_init *func;
+	for (func = &__driver_start; func < &__driver_end; func++) {
+		(*func)();
+	}
+}
+
+static void bus_init(void)
+{
+}
+
+__attribute((weak)) void hardware_init_hook(void)
+{
+#if CONFIG_EARLY_PRINTF
+	early_console_init();
+#endif
+	bus_init();
+	driver_init();
+	device_init();
+}
+
+__attribute((weak)) void _exit(int return_code)
 {
 	while(1);
 }

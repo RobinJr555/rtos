@@ -54,6 +54,10 @@ SECTIONS
 
 		*(.text*)
 
+		__driver_start = .;
+		KEEP(*(.driver.init))
+		__driver_end = .;
+
 		KEEP(*(.init))
 		KEEP(*(.fini))
 
