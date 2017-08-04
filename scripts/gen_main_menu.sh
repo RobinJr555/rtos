@@ -114,7 +114,7 @@ echo
 
 ######################################################################
 echo_separator "Select driver"
-if [ -f "Driver/Kconfig" ]; then
+if [ -f "driver/Kconfig" ]; then
 	echo "source \"driver/Kconfig\""
 fi
 echo

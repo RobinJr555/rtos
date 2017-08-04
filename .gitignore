@@ -37,6 +37,7 @@
 #
 /Kconfig
 /board/Kconfig
+/driver/Kconfig
 /app/Kconfig
 
 #
