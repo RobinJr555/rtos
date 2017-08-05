@@ -4,6 +4,12 @@ config SYS_DEFCONFIG
 	bool
 	default y
 	select CPU_V7M
+	select STM32F4
+	select CLOCK
+
+config CPU_V7M_CM4
+	bool
+	default y
 
 config SYS_BOARD
 	string
@@ -16,5 +22,8 @@ config SYS_VENDOR
 config SYS_SOC
 	string
 	default "stm32f4"
+
+config STM32F4
+	bool
 
 endif
