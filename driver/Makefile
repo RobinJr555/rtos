@@ -1,1 +1,2 @@
-obj-y += board_init.o
+obj-y += base/
+
