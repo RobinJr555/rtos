@@ -1,1 +1,1 @@
-obj-y += bus.o core.o
+obj-y += bus.o core.o platform.o

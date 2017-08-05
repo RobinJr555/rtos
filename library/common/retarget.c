@@ -16,6 +16,7 @@ static void driver_init(void)
 
 static void bus_init(void)
 {
+	platform_bus_init();
 }
 
 __attribute((weak)) void hardware_init_hook(void)
