@@ -9,6 +9,10 @@ struct pinctrl_group;
 
 struct platform_device {
 	const char *name;
+#if CONFIG_PINCTRL
+	const char *pinctrl;
+	struct pinctrl_groups *pingrp;
+#endif
 	int id;
 	struct device dev;
 	struct resource *resource;
@@ -26,6 +30,8 @@ struct platform_driver {
 #define to_platform_driver(drv)	(container_of((drv), struct platform_driver, \
 				 driver))
 
+extern struct resource *platform_get_resource(struct platform_device *dev,
+				       unsigned int type, unsigned int num);
 extern int platform_device_register(struct platform_device *pdev);
 extern int platform_driver_register(struct platform_driver *pdrv);
 

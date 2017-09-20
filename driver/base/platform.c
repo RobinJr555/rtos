@@ -1,7 +1,8 @@
+#include "common.h"
 #include "driver/base.h"
 #include "driver/device.h"
 #include "driver/platform.h"
-#include "common.h"
+#include "driver/resource.h"
 
 
 struct device platform_bus = {
@@ -9,6 +10,26 @@ struct device platform_bus = {
 };
 
 struct bus_node platform_bus_node;
+
+/**
+ * platform_get_resource - get a resource for a device
+ * @dev: platform device
+ * @type: resource type
+ * @num: resource index
+ */
+struct resource *platform_get_resource(struct platform_device *dev,
+				       unsigned int type, unsigned int num)
+{
+	unsigned int i;
+
+	for (i = 0; i < dev->num_resources; i++) {
+		struct resource *r = &dev->resource[i];
+
+		if ((type & r->flags) && (num-- == 0))
+			return r;
+	}
+	return NULL;
+}
 
 static const struct platform_device_id *platform_match_id(
 			const struct platform_device_id *id,
