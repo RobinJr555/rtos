@@ -4,7 +4,7 @@
 #include "driver/resource.h"
 #include "driver/clock.h"
 #include "asm/io.h"
-#include "asm/arch/stm32.h"
+#include "asm/arch/base.h"
 #include "asm/arch/clock.h"
 
 

@@ -1,8 +1,8 @@
 #include "common.h"
+#include "asm/arch/base.h"
 #include "asm/arch/clock.h"
 #include "asm/arch/gpio.h"
 #include "asm/arch/uart.h"
-#include "asm/arch/stm32.h"
 #include "asm/io.h"
 #include "driver/clock.h"
 

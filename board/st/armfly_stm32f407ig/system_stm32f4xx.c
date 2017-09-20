@@ -1,5 +1,5 @@
 #include "common.h"
-#include "asm/arch/stm32.h"
+#include "asm/arch/base.h"
 #include "driver/clock.h"
 
 
