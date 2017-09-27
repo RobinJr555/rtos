@@ -1,0 +1,11 @@
+menuconfig LED
+	bool "LED support"
+	default y
+
+if LED
+
+config LED_GPIO
+	bool "LED GPIO"
+	default n
+
+endif
