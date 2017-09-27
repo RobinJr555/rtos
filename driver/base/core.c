@@ -127,6 +127,13 @@ int driver_probe_device(struct device_driver *drv, struct device *dev)
 
 	dev->driver = drv;
 
+#if CONFIG_PINCTRL
+	/* If using pinctrl, bind pins now before probing */
+	ret = pinctrl_bind_pins(dev);
+	if (ret)
+		goto probe_failed;
+#endif
+
 	if (drv->probe) {
 		ret = drv->probe(dev);
 		if (ret)

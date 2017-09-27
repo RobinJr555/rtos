@@ -5,6 +5,7 @@
 #include "driver/clock.h"
 #include "driver/platform.h"
 #include "driver/resource.h"
+#include "driver/pinctrl.h"
 
 
 #endif /* __DRIVER_H */

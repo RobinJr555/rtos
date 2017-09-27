@@ -17,6 +17,9 @@ static void driver_init(void)
 static void bus_init(void)
 {
 	platform_bus_init();
+#if CONFIG_PINCTRL
+	pinctrl_bus_init();
+#endif
 }
 
 __attribute((weak)) void hardware_init_hook(void)
