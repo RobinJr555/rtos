@@ -37,5 +37,14 @@ extern unsigned char        __StackTop[];
 
 #define OS_CLOCK            CONFIG_SYS_CLK_FREQ
 
+// </h>
+// <h>OS Timer Tick Configuration
+// ==============================
+//
+//   <o>Tick value [Hz] <1-1000000>
+//   <i> Defines the timer tick interval value.
+//   <i> Default: 1000  (1ms)
+
+#define OS_TICK            CONFIG_SYS_HZ
 
 #endif
