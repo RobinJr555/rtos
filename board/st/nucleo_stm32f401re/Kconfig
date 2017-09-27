@@ -6,6 +6,7 @@ config SYS_DEFCONFIG
 	select CPU_V7M
 	select STM32F4
 	select CLOCK
+	select PINCTRL
 
 config CPU_V7M_CM4
 	bool
