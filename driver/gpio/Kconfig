@@ -1,0 +1,3 @@
+menuconfig GPIO
+	bool "GPIO support"
+	default n

@@ -3,6 +3,7 @@
 
 #include "driver/base.h"
 #include "driver/clock.h"
+#include "driver/gpio.h"
 #include "driver/platform.h"
 #include "driver/resource.h"
 #include "driver/pinctrl.h"
