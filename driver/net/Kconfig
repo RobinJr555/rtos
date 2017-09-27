@@ -1,0 +1,7 @@
+menuconfig NETDEVICE
+	bool "Network device support"
+	default n
+
+if NETDEVICE
+
+endif # NETDEIVES

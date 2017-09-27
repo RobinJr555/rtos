@@ -23,6 +23,9 @@ static void bus_init(void)
 #if CONFIG_GPIO
 	gpio_bus_init();
 #endif
+#if CONFIG_NETDEVICE
+	net_bus_init();
+#endif
 }
 
 __attribute((weak)) void hardware_init_hook(void)

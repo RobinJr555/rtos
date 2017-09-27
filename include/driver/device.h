@@ -15,6 +15,7 @@ enum node_type {
 	NODE_UART,
 	NODE_SPI,
 	NODE_CAN,
+	NODE_NET,
 };
 
 struct bus_node {
