@@ -26,6 +26,9 @@ struct resource {
 // RESOURCE_REG
 
 // RESOURCE_IRQ
+#define IRQ_FLAG_RISING			(0x00000000)
+#define IRQ_FLAG_FAILING		(0x00000001)
+#define IRQ_FLAG_MASK			(0x000000ff)
 
 // RESOURCE_DMA
 

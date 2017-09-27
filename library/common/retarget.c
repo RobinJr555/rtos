@@ -33,6 +33,7 @@ __attribute((weak)) void hardware_init_hook(void)
 #if CONFIG_EARLY_PRINTF
 	early_console_init();
 #endif
+	irq_init();
 	bus_init();
 	driver_init();
 	device_init();
